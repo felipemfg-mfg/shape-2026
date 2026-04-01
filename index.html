@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Shape 2026</title>
+
+<link rel="manifest" href="manifest.json">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background:#020617;
+    color:white;
+}
+
+header {
+    padding:15px;
+    text-align:center;
+    background:#22c55e;
+    font-weight:bold;
+}
+
+.card {
+    margin:10px;
+    padding:15px;
+    background:#0f172a;
+    border-radius:10px;
+}
+
+.progress {
+    height:20px;
+    background:#22c55e;
+    width:0%;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔥 SHAPE 2026</header>
+
+<div class="card">
+<h3>Progresso</h3>
+<div style="background:#1e293b;border-radius:10px;">
+<div id="bar" class="progress">0%</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Checklist</h3>
+
+<label><input type="checkbox" class="c">Treino</label><br>
+<label><input type="checkbox" class="c">Cardio</label><br>
+<label><input type="checkbox" class="c">Dieta</label><br>
+<label><input type="checkbox" class="c">Água</label><br>
+<label><input type="checkbox" class="c">Sono</label>
+
+</div>
+
+<div class="card">
+<h3>Peso</h3>
+<input id="peso" type="number">
+<button onclick="salvarPeso()">Salvar</button>
+<canvas id="chart"></canvas>
+</div>
+
+<script>
+const checks=document.querySelectorAll(".c");
+
+checks.forEach((c,i)=>{
+    c.checked=localStorage.getItem("c"+i)==="true";
+
+    c.addEventListener("change",()=>{
+        localStorage.setItem("c"+i,c.checked);
+        atualizar();
+    });
+});
+
+function atualizar(){
+    let total=checks.length,done=0;
+    checks.forEach(c=>{if(c.checked)done++;});
+    let p=Math.round(done/total*100);
+
+    let bar=document.getElementById("bar");
+    bar.style.width=p+"%";
+    bar.innerText=p+"%";
+}
+
+function salvarPeso(){
+    let p=document.getElementById("peso").value;
+    let data=JSON.parse(localStorage.getItem("peso")||"[]");
+    data.push(p);
+    localStorage.setItem("peso",JSON.stringify(data));
+    render();
+}
+
+function render(){
+    let data=JSON.parse(localStorage.getItem("peso")||"[]");
+
+    new Chart(document.getElementById("chart"),{
+        type:"line",
+        data:{
+            labels:data.map((_,i)=>i+1),
+            datasets:[{data:data}]
+        }
+    });
+}
+
+atualizar();
+render();
+
+if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+</html>
