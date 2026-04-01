@@ -6,37 +6,99 @@
 
 <title>Shape 2026</title>
 
-<link rel="manifest" href="manifest.json">
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
     margin:0;
-    font-family: Arial;
-    background:#020617;
-    color:white;
+    font-family: -apple-system, BlinkMacSystemFont;
+    background: #020617;
+    color: white;
 }
 
 header {
-    padding:15px;
-    text-align:center;
-    background:#22c55e;
-    font-weight:bold;
+    background: linear-gradient(135deg,#22c55e,#4ade80);
+    padding: 20px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 15px;
 }
 
 .card {
-    margin:10px;
-    padding:15px;
-    background:#0f172a;
-    border-radius:10px;
+    background: #0f172a;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+h3 {
+    margin-bottom: 12px;
+}
+
+.progress-bg {
+    background: #1e293b;
+    border-radius: 20px;
+    overflow: hidden;
 }
 
 .progress {
-    height:20px;
-    background:#22c55e;
-    width:0%;
-    text-align:center;
+    height: 22px;
+    background: linear-gradient(90deg,#22c55e,#4ade80);
+    width: 0%;
+    text-align: center;
+    font-size: 12px;
+    transition: 0.4s;
+}
+
+.check-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    background:#020617;
+    padding:10px;
+    border-radius:10px;
+}
+
+.check-item input {
+    transform: scale(1.3);
+}
+
+input {
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    width: 55%;
+}
+
+button {
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #22c55e;
+    color: white;
+    font-weight: bold;
+}
+
+.feedback {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+img {
+    border-radius: 12px;
+    margin: 5px;
+}
+
+.highlight {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4ade80;
 }
 </style>
 </head>
@@ -45,79 +107,144 @@ header {
 
 <header>🔥 SHAPE 2026</header>
 
+<div class="container">
+
 <div class="card">
-<h3>Progresso</h3>
-<div style="background:#1e293b;border-radius:10px;">
+<h3>📊 Progresso</h3>
+<div class="progress-bg">
 <div id="bar" class="progress">0%</div>
 </div>
+<p id="feedback" class="feedback"></p>
 </div>
 
 <div class="card">
-<h3>Checklist</h3>
+<h3>🏆 Performance</h3>
+<p class="highlight" id="performance">0%</p>
+</div>
 
-<label><input type="checkbox" class="c">Treino</label><br>
-<label><input type="checkbox" class="c">Cardio</label><br>
-<label><input type="checkbox" class="c">Dieta</label><br>
-<label><input type="checkbox" class="c">Água</label><br>
-<label><input type="checkbox" class="c">Sono</label>
+<div class="card">
+<h3>✅ Checklist</h3>
+
+<div class="check-item">Treino <input type="checkbox" class="c"></div>
+<div class="check-item">Cardio <input type="checkbox" class="c"></div>
+<div class="check-item">Dieta <input type="checkbox" class="c"></div>
+<div class="check-item">Água <input type="checkbox" class="c"></div>
+<div class="check-item">Sono <input type="checkbox" class="c"></div>
 
 </div>
 
 <div class="card">
-<h3>Peso</h3>
-<input id="peso" type="number">
+<h3>⚖️ Peso</h3>
+<input id="peso" type="number" placeholder="Digite seu peso">
 <button onclick="salvarPeso()">Salvar</button>
 <canvas id="chart"></canvas>
 </div>
 
+<div class="card">
+<h3>📸 Evolução</h3>
+<input type="file" accept="image/*" onchange="salvarFoto(event)">
+<div id="fotos"></div>
+</div>
+
+</div>
+
 <script>
-const checks=document.querySelectorAll(".c");
+const checks = document.querySelectorAll(".c");
 
 checks.forEach((c,i)=>{
-    c.checked=localStorage.getItem("c"+i)==="true";
+    c.checked = localStorage.getItem("c"+i) === "true";
 
     c.addEventListener("change",()=>{
-        localStorage.setItem("c"+i,c.checked);
+        localStorage.setItem("c"+i, c.checked);
         atualizar();
     });
 });
 
 function atualizar(){
-    let total=checks.length,done=0;
-    checks.forEach(c=>{if(c.checked)done++;});
-    let p=Math.round(done/total*100);
+    let total = checks.length, done = 0;
+    checks.forEach(c=>{ if(c.checked) done++; });
 
-    let bar=document.getElementById("bar");
-    bar.style.width=p+"%";
-    bar.innerText=p+"%";
+    let p = Math.round(done/total*100);
+
+    document.getElementById("bar").style.width = p+"%";
+    document.getElementById("bar").innerText = p+"%";
+    document.getElementById("performance").innerText = p+"%";
+
+    let feedback = document.getElementById("feedback");
+
+    if(p === 100){
+        feedback.innerText = "🔥 Perfeito! Disciplina máxima!";
+    } else if(p >= 60){
+        feedback.innerText = "💪 Bom! Continue consistente.";
+    } else {
+        feedback.innerText = "⚠️ Ajuste hoje para evoluir.";
+    }
 }
 
 function salvarPeso(){
-    let p=document.getElementById("peso").value;
-    let data=JSON.parse(localStorage.getItem("peso")||"[]");
-    data.push(p);
-    localStorage.setItem("peso",JSON.stringify(data));
+    let p = parseFloat(document.getElementById("peso").value);
+    if(!p) return;
+
+    let data = JSON.parse(localStorage.getItem("peso") || "[]");
+
+    data.push({
+        date: new Date().toLocaleDateString(),
+        peso: p
+    });
+
+    localStorage.setItem("peso", JSON.stringify(data));
     render();
 }
 
 function render(){
-    let data=JSON.parse(localStorage.getItem("peso")||"[]");
+    let data = JSON.parse(localStorage.getItem("peso") || "[]");
 
-    new Chart(document.getElementById("chart"),{
-        type:"line",
-        data:{
-            labels:data.map((_,i)=>i+1),
-            datasets:[{data:data}]
+    let labels = data.map(d => d.date);
+    let valores = data.map(d => d.peso);
+
+    new Chart(document.getElementById("chart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Peso",
+                data: valores,
+                tension: 0.3
+            }]
         }
     });
 }
 
-atualizar();
-render();
+function salvarFoto(e){
+    let file = e.target.files[0];
+    let reader = new FileReader();
 
-if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("service-worker.js");
+    reader.onload = function(){
+        let fotos = JSON.parse(localStorage.getItem("fotos") || "[]");
+        fotos.push(reader.result);
+        localStorage.setItem("fotos", JSON.stringify(fotos));
+        mostrarFotos();
+    };
+
+    reader.readAsDataURL(file);
 }
+
+function mostrarFotos(){
+    let fotos = JSON.parse(localStorage.getItem("fotos") || "[]");
+    let div = document.getElementById("fotos");
+    div.innerHTML = "";
+
+    fotos.forEach(f=>{
+        let img = document.createElement("img");
+        img.src = f;
+        img.width = 90;
+        div.appendChild(img);
+    });
+}
+
+render();
+mostrarFotos();
+atualizar();
 </script>
 
 </body>
